@@ -24,8 +24,8 @@ class Board
       end
       .join
     end
-
     puts print_board
+    
   end
 
   def [](pos)
@@ -38,8 +38,24 @@ class Board
     @board[7 - x][y] = piece
   end
 
-  def create_new_board
+  def pieces
+    @board.flatten.compact
+  end
 
+  def create_new_board
+    (0..7).each do |row_idx|
+      (0..7).each do |col_idx|
+        if (row_idx + col_idx).even?
+          if row_idx < 3
+            self[[col_idx, row_idx]] =
+              Piece.new(:black, self, [col_idx, row_idx]) 
+          elsif row_idx > 4
+            self[[col_idx, row_idx]] =
+              Piece.new(:red, self, [col_idx, row_idx]) 
+          end
+        end
+      end
+    end
   end
 
 end

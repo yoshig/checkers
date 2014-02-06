@@ -2,17 +2,17 @@ require 'colorize'
 
 class Piece
 
-  attr_reader :color
-  attr_accessor :square
+  attr_reader :color, :is_king
+  attr_accessor :square, :board
 
-  def initialize(color, board, square)
-    @color, @board, @square = color, board, square
+  def initialize(color, board, square, is_king = false)
+    @color, @board, @square, @is_king = color, board, square, @is_king
     
     color_direction = (@color == :black ? 1 : -1)
     @king_moves = [[1, 1], [1, -1], [-1, 1], [-1, -1]]
     @pawn_moves = @king_moves.select { |x, y| y == color_direction }
     @moves = @pawn_moves
-    @is_king = false
+    @is_king = is_king
   end
 
   def square_change(square, move)
@@ -88,8 +88,31 @@ class Piece
     end
   end
 
+  def perform_moves(move_arr)
+    #Have to dup the array so perform moves doesn't receive an empty array
+    perform_moves!(move_arr) if valid_move_seq?(move_arr.dup)
+  end
+
   def valid_move_seq?(move_arr)
-    
+    test_board = board_dup
+    test_piece = test_board[@square]
+    begin
+      test_piece.perform_moves!(move_arr)
+    rescue InvalidMoveError => e
+      puts e
+      false
+    else
+      true
+    end
+  end
+
+  def board_dup
+    @board.class.new.tap do |new_board|
+      @board.pieces.each do |piece|
+        new_board[piece.square] =
+          piece.class.new(piece.color, new_board, piece.square, piece.is_king)
+      end
+    end
   end
 
   def to_s
