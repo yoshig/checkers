@@ -1,4 +1,5 @@
 require 'colorize'
+require 'debugger'
 
 class Piece
 
@@ -11,7 +12,7 @@ class Piece
     color_direction = (@color == :black ? 1 : -1)
     @king_moves = [[1, 1], [1, -1], [-1, 1], [-1, -1]]
     @pawn_moves = @king_moves.select { |x, y| y == color_direction }
-    @moves = @pawn_moves
+    @moves = is_king ? @king_moves : @pawn_moves
     @is_king = is_king
   end
 
@@ -35,10 +36,8 @@ class Piece
   end
 
   def perform_slide(move_to)
-    if valid_slides.include?(move_to)
-      @board[@square], @board[move_to] = nil, self
-      @square = move_to
-    end
+    @board[@square], @board[move_to] = nil, self
+    @square = move_to
   end
 
   def valid_jumps
@@ -46,13 +45,13 @@ class Piece
       @moves.each do |move|
         jumped = square_change(@square, move)
         jump_to = square_change(jumped, move)
-        if on_board?(jump_to) && 
-             @board.empty_square?(jump_to) &&
-             jumpable?(jumped)
-          jumps << jump_to
-        end
+        jumps << jump_to if satisfies_jump_needs(jump_to, jumped)
       end
     end
+  end
+
+  def satisfies_jump_needs(jump_to, jumped)
+    on_board?(jump_to) && @board.empty_square?(jump_to) && jumpable?(jumped)
   end
 
   def jumpable?(square)
@@ -64,11 +63,9 @@ class Piece
   end
 
   def perform_jump(move_to)
-    if valid_jumps.include?(move_to)
-      jumped = find_jumped(@square, move_to)
-      @board[@square], @board[jumped], @board[move_to] = nil, nil, self
-      @square = move_to
-    end
+    jumped = find_jumped(@square, move_to)
+    @board[@square], @board[jumped], @board[move_to] = nil, nil, self
+    @square = move_to
   end
 
   def perform_moves!(move_arr)
@@ -86,14 +83,25 @@ class Piece
         end
       end
     end
+
+    # This goes at the end of the move, so that jumps can't continue when a
+    # piece becomes a king (going back down as a king)
+    check_king_square
+  end
+
+  def check_king_square
+    if @square[1] == (@color == :black ? 7 : 0)
+      @is_king = true 
+      @moves = @king_moves
+    end
   end
 
   def perform_moves(move_arr)
-    #Have to dup the array so perform moves doesn't receive an empty array
     perform_moves!(move_arr) if valid_move_seq?(move_arr.dup)
   end
 
   def valid_move_seq?(move_arr)
+    # debugger
     test_board = board_dup
     test_piece = test_board[@square]
     begin
@@ -109,14 +117,16 @@ class Piece
   def board_dup
     @board.class.new.tap do |new_board|
       @board.pieces.each do |piece|
+        # debugger
         new_board[piece.square] =
-          piece.class.new(piece.color, new_board, piece.square, piece.is_king)
+          piece.class.new(piece.color, new_board,
+                          piece.square, piece.is_king)
       end
     end
   end
 
   def to_s
-    icon = @is_king ? "\u26C3" : "\u26C2"
+    icon = @is_king ? "\u26C3" : "\u25CF"
     icon.encode("UTF-8") + " "
   end
 

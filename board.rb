@@ -2,6 +2,9 @@
 require 'colorize'
 
 class Board
+
+  attr_accessor :board
+
   def initialize(new_board = false)
     @board = Array.new(8) { Array.new(8) }
     
@@ -25,11 +28,11 @@ class Board
       .join
     end
     puts print_board
-    
+
   end
 
   def [](pos)
-    x, y = pos
+    y, x = pos
     @board[7 - x][y]
   end
 
@@ -40,6 +43,10 @@ class Board
 
   def pieces
     @board.flatten.compact
+  end
+
+  def team_eradicated?(player_color)
+    pieces.any? { |piece| piece.color == player_color }
   end
 
   def create_new_board
