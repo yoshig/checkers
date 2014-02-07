@@ -1,8 +1,8 @@
 require_relative './board'
 require_relative './piece'
 require_relative './errors'
-require_relative './player'
-require 'debugger'
+require_relative './humanplayer'
+require_relative './complayer'
 
 class Game
   def initialize(player1, player2)
@@ -40,7 +40,17 @@ class Game
   end
 
   def move_piece(move_array)
-    @board[move_array.shift].perform_moves(move_array)
+    start_piece = @board[move_array.shift]
+    check_valid_start_piece(start_piece)    
+    start_piece.perform_moves(move_array)
+  end
+
+  def check_valid_start_piece(start_piece)
+    if start_piece.nil?
+      raise InputError.new "You need to choose a correct space"
+    elsif start_piece.color != color_of(@players[0])
+      raise InputError.new "You must move your own piece"
+    end
   end
 
   def play

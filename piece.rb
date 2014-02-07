@@ -108,7 +108,6 @@ class Piece
       test_piece.perform_moves!(move_arr)
     rescue InvalidMoveError => e
       puts e
-      false
     else
       true
     end
