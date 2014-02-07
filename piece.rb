@@ -7,12 +7,11 @@ class Piece
   attr_accessor :square, :board
 
   def initialize(color, board, square, is_king = false)
-    @color, @board, @square, @is_king = color, board, square, @is_king
+    @color, @board, @square, @is_king = color, board, square, is_king
     
     color_direction = (@color == :black ? 1 : -1)
     @king_moves = [[1, 1], [1, -1], [-1, 1], [-1, -1]]
     @pawn_moves = @king_moves.select { |x, y| y == color_direction }
-    @moves = is_king ? @king_moves : @pawn_moves
     @is_king = is_king
   end
 
@@ -24,9 +23,13 @@ class Piece
     position.all? { |coord| coord.between?(0, 7) }
   end
 
+  def moves
+    is_king ? @king_moves : @pawn_moves
+  end
+
   def valid_slides
     [].tap do |slides|
-      @moves.each do |move|
+      moves.each do |move|
         slide_square = square_change(@square, move)
         if on_board?(slide_square) && @board.empty_square?(slide_square)
           slides << slide_square
@@ -42,7 +45,7 @@ class Piece
 
   def valid_jumps
     [].tap do |jumps|
-      @moves.each do |move|
+      moves.each do |move|
         jumped = square_change(@square, move)
         jump_to = square_change(jumped, move)
         jumps << jump_to if satisfies_jump_needs(jump_to, jumped)
@@ -75,24 +78,27 @@ class Piece
       perform_slide(move_arr.first)
     else
       until move_arr.empty?
-        next_move = move_arr.shift
-        if valid_jumps.include?(next_move)
-          perform_jump(next_move)
-        else
-          raise InvalidMoveError.new "Not a valid move!"
-        end
+        try_to_make_moves(move_arr)
       end
     end
-
     # This goes at the end of the move, so that jumps can't continue when a
     # piece becomes a king (going back down as a king)
     check_king_square
   end
 
+  def try_to_make_moves(move_arr)
+    next_move = move_arr.shift
+    if valid_jumps.include?(next_move)
+      perform_jump(next_move)
+    else
+      raise InvalidMoveError.new "Not a valid move!"
+    end
+  end
+
   def check_king_square
     if @square[1] == (@color == :black ? 7 : 0)
       @is_king = true 
-      @moves = @king_moves
+      moves = @king_moves
     end
   end
 
@@ -101,9 +107,7 @@ class Piece
   end
 
   def valid_move_seq?(move_arr)
-    # debugger
-    test_board = board_dup
-    test_piece = test_board[@square]
+    test_piece = board_dup[@square]
     begin
       test_piece.perform_moves!(move_arr)
     rescue InvalidMoveError => e
@@ -116,10 +120,8 @@ class Piece
   def board_dup
     @board.class.new.tap do |new_board|
       @board.pieces.each do |piece|
-        # debugger
         new_board[piece.square] =
-          piece.class.new(piece.color, new_board,
-                          piece.square, piece.is_king)
+          piece.class.new(piece.color, new_board, piece.square, piece.is_king)
       end
     end
   end
@@ -128,5 +130,4 @@ class Piece
     icon = @is_king ? "\u265A" : "\u26C3"
     " #{icon.encode("UTF-8")}  "
   end
-
 end

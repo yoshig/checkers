@@ -10,13 +10,14 @@ class ComputerPlayer
   end
 
   def find_all_valid_moves
-    all_moves = []
+    
+  end
+
+  def all_my_pieces
+    @board.pieces.select { |piece| piece.color == @color }
   end
 
   def make_move_chain(start_chain)
     cont_chain = start_chain.dup
-
-    perform_moves(start_chain)
-    
   end
 end

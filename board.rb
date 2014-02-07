@@ -51,19 +51,15 @@ class Board
   end
 
   def create_new_board
-    (0..7).each do |row_idx|
-      (0..7).each do |col_idx|
-        if (row_idx + col_idx).odd?
-          if row_idx < 3
-            self[[col_idx, row_idx]] =
-              Piece.new(:black, self, [col_idx, row_idx]) 
-          elsif row_idx > 4
-            self[[col_idx, row_idx]] =
-              Piece.new(:red, self, [col_idx, row_idx]) 
+    (0..7).each do |col|
+      (0..2).each do |row|
+         coords_and_colors = [[col, row], :black], [[7 - col, 7 - row], :red]
+         coords_and_colors.each do |position, color|
+          if (col + row).odd?
+            self[position] = Piece.new(color, self, position)
           end
         end
       end
     end
   end
-
 end
