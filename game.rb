@@ -3,12 +3,21 @@ require_relative './piece'
 require_relative './errors'
 require_relative './humanplayer'
 require_relative './complayer'
+require 'debugger'
 
 class Game
   def initialize(player1, player2)
     @player1, @player2, = player1, player2
     @board = Board.new(true)
     @players = [@player1, @player2]
+  end
+
+  def show_players_board_and_color
+    @players.each do |player|
+      if player.is_a?(ComputerPlayer)
+        player.get_game_info(@board, color_of(player))
+      end 
+    end
   end
 
   def color_of(player)
@@ -29,13 +38,14 @@ class Game
   def player_takes_turn
     whos_turn = @players[0]
     puts "#{color_of(whos_turn)}'s turn"
-    begin
+    #begin
+      # debugger
       player_input = whos_turn.moves
       move_piece(player_input)
-    rescue => e
-      puts e
-      retry
-    end
+    #rescue => e
+    #  puts e
+    #  retry
+    #end
     @players.rotate!
   end
 
@@ -54,6 +64,7 @@ class Game
   end
 
   def play
+    show_players_board_and_color
     until won?
       @board.show
       player_takes_turn
@@ -61,11 +72,18 @@ class Game
   end
 end
 
-a = Game.new(HumanPlayer.new, HumanPlayer.new)
+
+a = Game.new(HumanPlayer.new, ComputerPlayer.new)
 a.play
+# a.play
+
 
 # a = Board.new(true)
 # a.show
+# b = ComputerPlayer.new(a, :red)
+# p b.moves
+
+
 # b = Piece.new(:black, a, [2, 5], true)
 # a[[2, 5]] = b
 # p b.square
@@ -73,7 +91,6 @@ a.play
 # a[[3, 6]] = c
 # d = Piece.new(:red, a, [9, 1])
 # a[[0, 1]] = d
-
 # a.show
 # p "KING? #{b.is_king}"
 # # b.perform_jump([2, 2])

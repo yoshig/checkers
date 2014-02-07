@@ -1,16 +1,39 @@
+require 'debugger'
+
 class ComputerPlayer
 
-  def initialize(board, color)
-    @board, @color = board, color
+  def get_game_info(board, color)
+    @board = board
+    @color = color
   end
 
   def moves
-    best_moves = find_all_moves.sort { |x, y| x.count <=> y.length }
+    best_moves.sort! { |x, y| x.count <=> y.count }
     best_moves.last
   end
 
-  def find_all_valid_moves
-    
+  def best_moves
+    return all_jumps unless all_jumps.empty?
+    all_slides
+  end
+
+  def all_jumps
+    # [].tap do |jumps_arr|
+    #   all_my_pieces.each do |piece|
+    #   end
+    #   jumps_arr
+    # end
+    []
+  end
+
+  def all_slides
+    [].tap do |slides_arr|
+      all_my_pieces.each do |piece|
+        piece.valid_slides.each do |slide|
+          slides_arr << [piece.square, slide]
+        end
+      end
+    end
   end
 
   def all_my_pieces
