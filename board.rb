@@ -19,15 +19,16 @@ class Board
 
   def show
     print_board = @board.map.with_index do |row, row_ind|
-      row.map.with_index do |square, col_ind|
+      "#{(8 - row_ind)} " + row.map.with_index do |square, col_ind|
         piece_color = (square.nil? || square.color == :black ? :black : :red)
-        sq_color = ((row_ind + col_ind).even? ? :black : :white)
-        (square.nil? ? "  " : square.to_s)
+        sq_color = ((row_ind + col_ind).odd? ? :black : :white)
+        (square.nil? ? "    " : square.to_s)
         .colorize(:background => sq_color, :color => piece_color)
       end
       .join
     end
     puts print_board
+    puts "   " + ("a".."h").to_a.join("   ")
 
   end
 
@@ -46,13 +47,13 @@ class Board
   end
 
   def team_eradicated?(player_color)
-    pieces.any? { |piece| piece.color == player_color }
+    pieces.none? { |piece| piece.color == player_color }
   end
 
   def create_new_board
     (0..7).each do |row_idx|
       (0..7).each do |col_idx|
-        if (row_idx + col_idx).even?
+        if (row_idx + col_idx).odd?
           if row_idx < 3
             self[[col_idx, row_idx]] =
               Piece.new(:black, self, [col_idx, row_idx]) 

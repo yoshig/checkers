@@ -126,8 +126,8 @@ class Piece
   end
 
   def to_s
-    icon = @is_king ? "\u26C3" : "\u25CF"
-    icon.encode("UTF-8") + " "
+    icon = @is_king ? "\u265A" : "\u26C3"
+    " #{icon.encode("UTF-8")}  "
   end
 
 end
