@@ -110,8 +110,9 @@ class Piece
     test_piece = board_dup[@square]
     begin
       test_piece.perform_moves!(move_arr)
-    rescue InvalidMoveError => e
-      puts e
+      # Rescued in the Game class
+    # rescue InvalidMoveError => e
+    #   puts e
     else
       true
     end

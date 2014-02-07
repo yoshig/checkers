@@ -3,7 +3,6 @@ require_relative './piece'
 require_relative './errors'
 require_relative './humanplayer'
 require_relative './complayer'
-require 'debugger'
 
 class Game
   def initialize(player1, player2)
@@ -28,7 +27,8 @@ class Game
   def won?
     @players.each do |player|
       if @board.team_eradicated?(color_of(player))
-        puts "#{color_of(player)} wins!"
+        winning_color = colof_of(player) == :red ? :white : :red
+        puts "#{winning_color} wins!"
         return true
       end
     end
@@ -38,14 +38,13 @@ class Game
   def player_takes_turn
     whos_turn = @players[0]
     puts "#{color_of(whos_turn)}'s turn"
-    #begin
-      # debugger
+    begin
       player_input = whos_turn.moves
       move_piece(player_input)
-    #rescue => e
-    #  puts e
-    #  retry
-    #end
+    rescue => e
+     puts e
+     retry
+    end
     @players.rotate!
   end
 
@@ -69,6 +68,7 @@ class Game
       @board.show
       player_takes_turn
     end
+    @board.show
   end
 end
 

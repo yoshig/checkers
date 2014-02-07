@@ -18,12 +18,13 @@ class ComputerPlayer
   end
 
   def all_jumps
-    # [].tap do |jumps_arr|
-    #   all_my_pieces.each do |piece|
-    #   end
-    #   jumps_arr
-    # end
-    []
+    [].tap do |jumps_arr|
+       all_my_pieces.each do |piece|
+        piece.valid_jumps.each do |jump|
+          jumps_arr << [piece.square, jump]
+       end
+     end
+    end
   end
 
   def all_slides
