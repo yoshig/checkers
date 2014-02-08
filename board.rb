@@ -50,6 +50,15 @@ class Board
     pieces.none? { |piece| piece.color == player_color }
   end
 
+  def dup
+    self.class.new.tap do |new_board|
+      pieces.each do |piece|
+        new_board[piece.square] =
+          piece.class.new(piece.color, new_board, piece.square, piece.is_king)
+      end
+    end
+  end
+
   def create_new_board
     (0..7).each do |col|
       (0..2).each do |row|

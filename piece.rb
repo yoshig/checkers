@@ -1,5 +1,4 @@
 require 'colorize'
-require 'debugger'
 
 class Piece
 
@@ -107,23 +106,10 @@ class Piece
   end
 
   def valid_move_seq?(move_arr)
-    test_piece = board_dup[@square]
     begin
-      test_piece.perform_moves!(move_arr)
-      # Rescued in the Game class
-    # rescue InvalidMoveError => e
-    #   puts e
+      @board.dup[@square].perform_moves!(move_arr)
     else
       true
-    end
-  end
-
-  def board_dup
-    @board.class.new.tap do |new_board|
-      @board.pieces.each do |piece|
-        new_board[piece.square] =
-          piece.class.new(piece.color, new_board, piece.square, piece.is_king)
-      end
     end
   end
 

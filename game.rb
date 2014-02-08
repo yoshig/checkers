@@ -1,10 +1,13 @@
-require_relative './board'
-require_relative './piece'
-require_relative './errors'
-require_relative './humanplayer'
-require_relative './complayer'
+require_relative 'board'
+require_relative 'piece'
+require_relative 'errors'
+require_relative 'humanplayer'
+require_relative 'complayer'
 
 class Game
+
+  attr_accessor :board
+
   def initialize(player1, player2)
     @player1, @player2, = player1, player2
     @board = Board.new(true)
@@ -72,34 +75,17 @@ class Game
   end
 end
 
-
-a = Game.new(HumanPlayer.new, ComputerPlayer.new)
-a.play
-# a.play
-
-
-# a = Board.new(true)
-# a.show
-# b = ComputerPlayer.new(a, :red)
-# p b.moves
-
-
-# b = Piece.new(:black, a, [2, 5], true)
-# a[[2, 5]] = b
-# p b.square
-# c = Piece.new(:red, a, [3, 6])
-# a[[3, 6]] = c
-# d = Piece.new(:red, a, [9, 1])
-# a[[0, 1]] = d
-# a.show
-# p "KING? #{b.is_king}"
-# # b.perform_jump([2, 2])
-# p b.valid_slides
-# puts "B: #{b}"
-# b.perform_moves([[4, 7]])
-# p "KING? #{b.is_king}"
-# puts ""
-# a.show
-# p b.valid_jumps
-# b.perform_moves([[7, 5]])
-# a.show
+w = ComputerPlayer.new
+# a = Game.new(HumanPlayer.new, w)
+a = Board.new
+b = Piece.new(:black, a, [0, 1])
+a[[0, 1]] = b
+c = Piece.new(:red, a, [1, 2])
+a[[1, 2]] = c
+d = Piece.new(:red, a, [1, 4])
+a[[1, 4]] = d
+e = Piece.new(:black, a, [2, 1])
+a[[2, 1]] = e
+a.show
+w.get_game_info(a, :black)
+p w.moves
