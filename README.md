@@ -15,8 +15,3 @@ Also, in order to move a piece, I created a method called square change, which g
   end
 
 Pretty sweet, right?
-
-`def test
-  is it working?
-  end
-  `
